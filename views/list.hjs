@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/magicsuggest-min.css" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+<style>
+body {
+	margin: 50px;
+}
+section {
+	max-width: 100%;
+	padding: 0;
+	padding-top: 15px;
+}
+a {
+	display: block;
+}
+h2 {
+	color: #999;
+	padding: 0;
+}
+</style>
+
+<a href="/admin/upsert">New</a>
+<section>
+{{#docs}}
+<h2>Apps</h2>
+{{#app}}
+	<a href="/admin/upsert/{{_id}}">{{name}}</a>
+{{/app}}
+<h2>Icons</h2>
+{{#icon}}
+	<a href="/admin/upsert/{{_id}}">{{name}}</a>
+{{/icon}}
+<h2>Themes</h2>
+{{#theme}}
+	<a href="/admin/upsert/{{_id}}">{{name}}</a>
+{{/theme}}
+<h2>Miscellaneous</h2>
+{{#misc}}
+	<a href="/admin/upsert/{{_id}}">{{name}}</a>
+{{/misc}}
+{{/docs}}
+</section
+</body>
+</html>

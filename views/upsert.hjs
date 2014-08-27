@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+<style>
+body {
+  margin: 50px;
+}
+</style>
+  <a class="remove" href="/admin/remove/{{doc._id}}" onclick="return confirm('Remove {{doc.name}}?')">Remove</a>
+ <p>$tmp = /tmp/infinity<br>$arch = amd64 or i386<br>$distro = freya, precise, trusty<br>if [[ $distro == "freya" ]]; then (elif, else, fi)</p>
+<form method="POST" enctype="multipart/form-data" action="/admin/upsert/{{doc._id}}">
+<div class="form-group">
+  <label>Name</label>
+  <input name="name" type="text" class="form-control" value="{{doc.name}}" required>
+</div>
+<div class="form-group">
+  <label>Echo (defaults to "Installing Name")</label>
+  <input name="echo" type="text" class="form-control" value="{{doc.echo}}">
+</div>
+<div class="form-group">
+  <label>Description</label>
+  <input name="desc" type="text" class="form-control" value="{{doc.desc}}" required>
+</div>
+<div class="form-group">
+  <label>PPA</label>
+  <textarea name="ppa" class="form-control">{{doc.ppa}}</textarea>
+</div>
+<div class="form-group">
+  <label>Command</label>
+  <textarea name="command" class="form-control" required>{{doc.command}}</textarea>
+</div>
+<div class="form-group">
+  <label>Link to more info</label>
+  <input type="text" name="link" class="form-control" value="{{doc.link}}">
+</div>
+<div class="form-group">
+  <label>Image (Icon)</label>
+  <input name="image" type="file">
+  {{#doc.image}}
+    <img src="/image/{{doc._id}}">
+  {{/doc.image}}
+</div>
+<div class="form-group">
+	<label>Type</label>
+  <select name="type" class="form-control type" value="{{doc.type}}" required>
+  	<option value="app" selected="">Application</option>
+  	<option value="icon">Icon Theme</option>
+  	<option value="theme">Gtk Theme</option>
+    <option value="misc">Miscellaneous</option>
+  </select>
+  </div>
+  <button type="submit" class="btn btn-default">Save</button>
+</form>
+	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="/javascripts/magicsuggest-min.js"></script>
+    <script src="/javascripts/jquery.autosize.min.js"></script>
+<script>
+$(function(){
+  {{#doc.type}}
+  $('.type').val("{{doc.type}}");
+  {{/doc.type}}
+  $('textarea').autosize();
+});
+</script
+  </body>
+  </html>

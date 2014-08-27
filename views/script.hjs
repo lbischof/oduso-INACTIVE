@@ -1,0 +1,72 @@
+#!/bin/bash
+clear
+
+{{#hastmp}}
+# Create a secure tmp directory
+tmp=${TMPDIR-/tmp}
+	tmp=$tmp/oduso.$RANDOM.$RANDOM.$RANDOM.$$ # Use a random name so it's secure
+	(umask 077 && mkdir "$tmp") || { # Another security precaution
+		echo "Could not create temporary directory! Exiting." 1>&2 
+		exit 1
+	}
+
+{{/hastmp}}
+{{#hasarch}}
+# Checks if the system is 64bit or 32bit
+[[ $(uname -m) == x86_64 ]] && arch=amd64 || arch=i386
+
+{{/hasarch}}
+{{#hasdistro}}
+distro=$(lsb_release -c | cut -f2)
+
+{{/hasdistro}}
+#use sudo rights for the whole script
+sudo -s <<ODUSO
+
+clear
+
+echo ------------------
+echo "Welcome to ODUSO"
+echo ------------------
+echo "   "
+sleep 2
+
+{{#hastmp}}
+trap "rm -rf $tmp" EXIT # Delete tmp files on exit
+
+{{/hastmp}}
+{{#hasppa}}
+# Add all the repositories
+echo "Adding Repositories" 
+(
+{{#ppas}}
+{{{.}}}
+{{/ppas}}
+) &> /dev/null && echo -e '\e[32mOK\e[39m' || echo -e '\e[31mFAILED\e[39m'; # Hide all output
+
+echo "Updating System" 
+(
+apt-get update
+) &> /dev/null && echo -e '\e[32mOK\e[39m' || echo -e '\e[31mFAILED\e[39m'; # Hide all output
+
+{{/hasppa}}
+{{#docs}}
+{{#command}}
+{{#echo}}
+echo "{{echo}}"
+{{/echo}}
+{{^echo}}
+echo "Installing {{{name}}}"
+{{/echo}}
+(
+{{{command}}}
+) &> /dev/null && echo -e '\e[32mOK\e[39m' || echo -e '\e[31mFAILED\e[39m'; # Hide all output
+{{/command}}
+
+{{/docs}}
+{{#whenDone}}
+{{{whenDone}}}
+
+{{/whenDone}}
+ODUSO
+exit 0

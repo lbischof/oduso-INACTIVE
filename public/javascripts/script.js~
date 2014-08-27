@@ -1,0 +1,45 @@
+$(function() {
+    var ms = $('#ms').magicSuggest({
+        data: 'api/apps',
+        valueField: '_id',
+        displayField: 'name',
+        allowFreeEntries: false,
+        selectionPosition: 'bottom',
+        typeDelay: 0,
+        renderer: function(data){
+            var img = '';
+            if (data.imageType) 
+                img = '<img height="22" style="margin-right: 5px" src="/image/' + data._id + '">';
+            return img + data.name;
+        },
+        selectionRenderer: function(data){
+            var img = '';
+            if (data.imageType) 
+                img = '<img height="22" style="margin-right: 5px" src="/image/' + data._id + '">';
+            return '<span>'+img + data.name+'</span>';
+        }
+    });
+    ms.setSelection(JSON.parse(localStorage.getItem('ms')));
+    $('#mainForm').submit(function(e){
+        $(this).find (':submit').attr ('disabled', 'disabled');
+    	$.ajax({
+    		type: "POST",
+    		url: $(this).attr('action'),
+    		data: $(this).serialize(),
+    		success: function(data){
+    			$('#generatedCommand').text(data);
+    		}, 
+            error: function(xhr){
+                $('#generatedCommand').text(xhr.responseText);
+            }
+    	});
+    	e.preventDefault();
+    });
+    $(ms).on('selectionchange', function(e,m){
+        $('#mainForm').find (':submit').removeAttr ('disabled');
+        localStorage.setItem('ms',JSON.stringify(this.getSelection()));
+    });
+    $('#mainForm').change(function (e) {
+        $(this).find (':submit').removeAttr ('disabled');
+    });
+});

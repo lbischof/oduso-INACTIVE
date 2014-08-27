@@ -1,35 +1,25 @@
 {
-  "name": "OpenShift-Sample-App",
-  "version": "1.0.0",
-  "description": "OpenShift Sample Application",
-  "keywords": [
-    "OpenShift",
-    "Node.js",
-    "application",
-    "openshift"
-  ],
-  "author": {
-    "name": "OpenShift",
-    "email": "ramr@example.org",
-    "url": "http://www.openshift.com/"
-  },
-  "homepage": "http://www.openshift.com/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/openshift/origin-server"
-  },
-
-  "engines": {
-    "node": ">= 0.6.0",
-    "npm": ">= 1.0.0"
-  },
-
-  "dependencies": {
-    "express": "~3.4.4"
-  },
-  "devDependencies": {},
-  "bundleDependencies": [],
-
+  "name": "infinity",
+  "version": "0.0.1",
   "private": true,
-  "main": "server.js"
+  "scripts": {
+    "start": "node ./server.js"
+  },
+  "dependencies": {
+    "MD5": "^1.2.1",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "~1.0.0",
+    "connect-flash": "^0.1.1",
+    "debug": "~0.7.4",
+    "express": "~4.2.0",
+    "express-session": "^1.7.2",
+    "hjs": "~0.0.6",
+    "mongodb": "^1.4.7",
+    "mongojs": "^0.13.0",
+    "morgan": "~1.0.0",
+    "multiparty": "^3.3.1",
+    "passport": "^0.2.0",
+    "passport-local": "^1.0.0",
+    "static-favicon": "~1.0.0"
+  }
 }
