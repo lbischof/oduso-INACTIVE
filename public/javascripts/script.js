@@ -1,5 +1,5 @@
 $(function() {
-    $(".logo").fitText(0.7);
+    $(".logo").fitText(0.7, {maxFontSize: '100px'});
     var ms = $('#ms').magicSuggest({
         data: 'api/apps',
         valueField: '_id',
