@@ -69,11 +69,8 @@ margin: 9px 2px 0 10px;
 font-family: cursive;
 transition: color 0.3s;
 }
-.apps .tooltip {
+.tooltip {
 	margin-left:10px;
-}
-#generatedIcons .tooltip {
-    margin-top: 5px;
 }
 .generate {
 	margin: 30px auto 0;
@@ -95,12 +92,8 @@ transition: color 0.3s;
 	font-size: 20px;
 	color: #333;
 }
-#generatedIcons {
-	font-size: 25px;
-}
-#generatedIcons a {
-    padding: 10px;
-    display: inline-block;
+#generatedScript {
+	display: block;
 }
 #whenDone {
 	background: white;
@@ -189,13 +182,6 @@ margin: 5px 0;
 .type > div span {
 	margin-left: 5px;
     font-weight: normal;
-}
-footer {
-text-align: center;
-}
-footer a {
-padding: 10px;
-color: #444;
 }
 ::-moz-selection{
 background-color: #bfb1d5;

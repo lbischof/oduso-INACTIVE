@@ -79,10 +79,20 @@
 </form>
 <div id="generated">
 <div id="generatedCommand">.</div>
-<a id="generatedScript" target="_blank">.</a>
-<a id="generatedMailto" target="_blank">.</a>
+<div id="generatedIcons" target="_blank">
+	<a class="source" data-toggle="tooltip" title="View Source" target="_blank"><span class="glyphicon glyphicon-eye-open"></span></a>
+	<a class="email" data-toggle="tooltip" title="Send via Email" target="_blank"><span class="glyphicon glyphicon-envelope"></span></a>
+	<a class="save" data-toggle="tooltip" title="Download (see FAQ)"><span class="glyphicon glyphicon-floppy-disk"></span></a>
 </div>
+
+</div>
+
 </section>
+<!--<footer>
+<a href="faq">FAQ</a>
+<a href="news">News</a>
+<a href="support">Support</a>
+</footer>-->
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
       <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script src="/javascripts/magicsuggest-min.js"></script>

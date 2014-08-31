@@ -40,18 +40,15 @@ $(function() {
     		success: function(data){
                 var data = JSON.parse(data);
     			$('#generatedCommand').text(data.command);
-                $('#generatedScript').css({visibility: "visible"}).attr("href", data.link);
-                $('#generatedScript').text("Never trust scripts from the internet! Click here to view source.");
-                $('#generatedMailto').css({visibility: "visible"}).attr("href", "mailto:?subject=Oduso Installer&body=Paste this command into your Terminal to run the Installer:%0D%0A"+data.command);
-                $('#generatedMailto').text("Save Command (email)");
+                $('#generatedIcons .source').attr("href", data.link);
+                $('#generatedIcons .email').attr("href", "mailto:?subject=Oduso Installer&body=Paste this command into your Terminal to run the Installer:%0D%0A"+data.command);
+                $('#generatedIcons .save').attr("href", data.link+"/download");
                 $('#generated').css({visibility: "visible"}).fadeTo(400, 1);
                 SelectText('generatedCommand');
     		},
             error: function(xhr){
-                $('#generatedCommand').text(xhr.responseText);
-                $('#generatedScript').css({visibility: "hidden"});
-                $('#generatedMailto').css({visibility: "hidden"});
-                $('#generated').css({visibility: "visible"}).fadeTo(400, 1);
+                alert("Nothing selected. Please select some apps or themes so I can generate an installer script.");
+                //$('#generated').css({visibility: "visible"}).fadeTo(400, 1);
             }
     	});
     	e.preventDefault();
