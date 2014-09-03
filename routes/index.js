@@ -61,7 +61,7 @@ router.get('/', function(req, res) {
 		res.render('index', {title: 'oduso', types: types});
 	});
 });
-router.get('/s/oduso-:id.sh/:option?',function(req, res){
+router.get('/oduso-:id.sh/:option?',function(req, res){
 	db.scripts.findOne({uid: req.params.id}, function (error, result) {
 		var script = result.script;
 		var output;
@@ -83,7 +83,7 @@ function generateUID() {
 	return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
 }
 function generateWgetCommand(uid, host){
-	var link = host+"/s/oduso-"+uid+".sh";
+	var link = host+"/oduso-"+uid+".sh";
 	var output = {};
 	output.command = "wget -O - "+link+" | bash";
 	output.link = "http://"+link;
