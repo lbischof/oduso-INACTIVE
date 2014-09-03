@@ -136,7 +136,7 @@ router.post('/generate', function(req, res){
 		}
 		ids = ids.concat(req.body.themes);
 		ids = ids.concat(req.body.icons);
-		ids.push("53ee44d8a9b466bc881f1dbb");
+		ids.push("540747336fcf61f2a00c140a");
 	}
 	var whenDone = req.body.whenDone;
 	var whenDoneCommand = getCommand(whenDone);
