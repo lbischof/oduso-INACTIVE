@@ -64,18 +64,13 @@ router.get('/', function(req, res) {
 router.get('/oduso-:id.sh/:option?',function(req, res){
 	db.scripts.findOne({uid: req.params.id}, function (error, result) {
 		var script = result.script;
-		var output;
 		res.set('Content-Type', 'text/plain');
 		if (req.params.option == "log"){
-			output = script.replace(/&>.\/dev\/null/g, "&>> ~/oduso-log-"+req.params.id+".txt");
-			output = output.replace("&>>", "&>");
+			script = script.replace(/&>.\/dev\/null/g, "&>> ~/oduso-log-"+req.params.id+".txt").replace("&>>", "&>");
 		} else if (req.params.option == "download") {
-			output = script;
    			res.set({"Content-Disposition":"attachment; filename=\"oduso-"+req.params.id+".sh\""});
-		} else {
-			output = script;
-		}
-		res.send(output);
+		} 
+		res.send(script);
 	});
 });
 
@@ -320,8 +315,28 @@ router.post('/admin/upsert/:id?', function(req, res){
 		});
 	});
 });
+router.get('/everything', function(req,res){
+	
+	var host = "oduso.com";
+	
+		db.apps.find(function(err, docs){
+			var ppas = [];
+			docs.forEach(function(element, index, array){
+				if (element.ppa) {
+					if (element.ppa.match(/^ppa:/))
+						element.ppa = "apt-add-repository "+element.ppa+" -y";
+					ppas.push(element.ppa);
+				}
+			});
+			
+			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: true, hasdistro: true}, function(err, html){
+				res.set('Content-Type', 'text/plain');
+				var script = html.replace(/&>.\/dev\/null/g, "&>> ~/oduso-everything.txt").replace("&>>", "&>");
+				res.send(script);
+			});
+		});
 
-
+});
 function isLoggedIn(req, res, next) {
 	console.log(req.url);
 	// if user is authenticated in the session, carry on 
