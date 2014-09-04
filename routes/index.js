@@ -66,7 +66,7 @@ router.get('/oduso-:id.sh/:option?',function(req, res){
 		var script = result.script;
 		res.set('Content-Type', 'text/plain');
 		if (req.params.option == "log"){
-			script = script.replace(/&>.\/dev\/null/g, "&>> ~/oduso-log-"+req.params.id+".txt").replace("&>>", "&>");
+			script = script.replace(/2>.\/dev\/null/g, "2>> ~/oduso-log-"+req.params.id+".txt").replace("2>>", "2>");
 		} else if (req.params.option == "download") {
    			res.set({"Content-Disposition":"attachment; filename=\"oduso-"+req.params.id+".sh\""});
 		} 
@@ -331,7 +331,7 @@ router.get('/everything', function(req,res){
 			
 			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: true, hasdistro: true}, function(err, html){
 				res.set('Content-Type', 'text/plain');
-				var script = html.replace(/&>.\/dev\/null/g, "&>> ~/oduso-everything.txt").replace("&>>", "&>");
+				var script = html.replace(/2>.\/dev\/null/g, "&>> ~/oduso-everything.txt").replace("2>>", "2>");
 				res.send(script);
 			});
 		});
