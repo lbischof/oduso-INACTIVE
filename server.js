@@ -10,6 +10,7 @@ var session = require('express-session');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var flash = require('connect-flash');
+var cookieParser = require('cookie-parser')
 
 var app = express();
 var passport = require('passport');
@@ -20,6 +21,7 @@ app.set('view engine', 'hjs');
 app.set('ip_addr', process.env.OPENSHIFT_NODEJS_IP   || '127.0.0.1');
 app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 3000);
 
+app.use(cookieParser())
 app.use(flash());
 app.use(favicon());
 app.use(logger('dev'));
@@ -29,8 +31,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret: 'keyboard cat'}));
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+
 app.use('/', routes);
 app.use('/users', users);
+
+
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -5,9 +5,10 @@ var fs = require('fs');
 var multiparty = require('multiparty');
 var router = express.Router();
 var bcrypt = require('bcrypt-nodejs');
-var connection_string = '127.0.0.1:27017/app';
+var connection_string = '127.0.0.1:27017/oduso';
 var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
 var md5 = require('MD5');
+var cookieParser = require('cookie-parser')
 
 
 // if OPENSHIFT env variables are present, use the available connection info:
@@ -18,7 +19,7 @@ if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
 	process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
 	process.env.OPENSHIFT_APP_NAME;
 }
-var db = mongojs(connection_string, ['apps','users','scripts']);
+var db = mongojs(connection_string, ['apps','users','scripts','distros']);
 
 passport.serializeUser(function(user, done) {
 	done(null, user);
@@ -51,15 +52,34 @@ passport.use(new LocalStrategy(
 /* GET home page. */
 
 router.get('/', function(req, res) {
-	db.apps.find({}, function(err,docs){ //get themes
-		var types = docs.reduce(function(buckets,doc){
-			if(!buckets[doc.type]) buckets[doc.type] = [];
-			buckets[doc.type].push(doc);
-			return buckets;
-		},{});
-		//console.log(docs);
-		res.render('index', {title: 'oduso', types: types});
-	});
+
+  // check if client sent cookie
+  var cookie = req.cookies.distro;
+  if (cookie === undefined)
+  {
+  	res.cookie('distro','freya', { maxAge: 900000, httpOnly: false });
+  	console.log('cookie have created successfully');
+	getApps("freya", function(types){
+    	res.render('index', {title: 'oduso', types: types, distro: cookie});
+    });  
+} 
+  else
+  {
+    // yes, cookie was already present 
+    console.log('cookie exists', cookie);
+    getApps(cookie, function(types){
+    	res.render('index', {title: 'oduso', types: types});
+    });
+  } 
+});
+router.get('/form', function(req, res){
+	if (req.query.distro){
+		console.log(req.query.distro);
+		getApps(req.query.distro, function(types){
+			console.log(types);
+    	res.render('form', {types: types});
+    }); 
+	}
 });
 router.get('/oduso-:id.sh/:option?',function(req, res){
 	db.scripts.findOne({uid: req.params.id}, function (error, result) {
@@ -68,12 +88,23 @@ router.get('/oduso-:id.sh/:option?',function(req, res){
 		if (req.params.option == "log"){
 			script = script.replace(/&>.\/dev\/null/g, "> /dev/null 2>> ~/oduso-log-"+req.params.id+".txt").replace("2>>", "2>");
 		} else if (req.params.option == "download") {
-   			res.set({"Content-Disposition":"attachment; filename=\"oduso-"+req.params.id+".sh\""});
+			res.set({"Content-Disposition":"attachment; filename=\"oduso-"+req.params.id+".sh\""});
 		} 
 		res.send(script);
 	});
 });
-
+function getApps(distro, callback){
+	console.log(distro);
+db.apps.find({'command.distros':distro}, function(err,docs){ //get themes
+		var types = docs.reduce(function(buckets,doc){
+			if(!buckets[doc.type]) buckets[doc.type] = [];
+			buckets[doc.type].push(doc);
+			return buckets;
+		},{});
+		//console.log(types);
+		callback(types);
+	});
+}
 function generateUID() {
 	return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
 }
@@ -122,21 +153,28 @@ function getCommand(whenDone){
 
 	return command;
 }
+Array.prototype.contains = function(element){
+    return this.indexOf(element) > -1;
+};
 router.post('/generate', function(req, res){
-	var ids = req.body.apps;
-	
-	if (req.body.themes || req.body.icons){
-		if (!ids) {
-			ids = [];
-		}
+	var ids = [];
+	if (req.body.apps)
+	ids = req.body.apps;
+	if (req.body.themes){
+		
 		ids = ids.concat(req.body.themes);
-		ids = ids.concat(req.body.icons);
-		ids.push("540747336fcf61f2a00c140a");
+		//ids.push("540747336fcf61f2a00c140a");
+	} 
+	if (req.body.icons){
+				ids = ids.concat(req.body.icons);
+
 	}
+			console.log(ids);
+
 	var whenDone = req.body.whenDone;
 	var whenDoneCommand = getCommand(whenDone);
 	var host = req.get('host');
-	if (ids){
+	if (ids[0] != null){
 		ids = ids.map(function(id) { return mongojs.ObjectId(id); });
 		db.apps.find({_id: {$in: ids}}, {_id: 0}, function(err, docs){
 			var ppas = [];
@@ -145,27 +183,36 @@ router.post('/generate', function(req, res){
 			var hasppa = false;
 			var hasdistro = false;
 			var installTweaks = false;
+			var command;
 			docs.forEach(function(element, index, array){
-				if (element.ppa) {
-					if (element.ppa.match(/^ppa:/))
-						element.ppa = "apt-add-repository "+element.ppa+" -y";
-					ppas.push(element.ppa);
+
+					if (element.command[0] != null){
+						array[index].command = element.command.filter(function(element){
+							return element.distros.contains("freya");
+						})[0].command;
+					}
+					if (element.ppa[0] != null){
+						array[index].ppa = element.ppa.filter(function(element){
+							return element.distros.contains("freya");
+						})[0].ppa;
+					}
+					
+					if (array[index].ppa) {
+					if (array[index].ppa.match(/^ppa:/))
+						array[index].ppa = "apt-add-repository "+array[index].ppa+" -y";
+					ppas.push(array[index].ppa);
 					hasppa = true;
 				}
 			});
-			
 			if (JSON.stringify(docs).indexOf("$tmp") > -1) 
 				hastmp = true;
 			
 			if (JSON.stringify(docs).indexOf("$arch") > -1) 
 				hasarch = true;
 			
-			if (JSON.stringify(docs).indexOf("$distro") > -1) 
-				hasdistro = true;
-
 			docs.sort(compare);
 			
-			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), whenDone: whenDoneCommand, hastmp: hastmp, hasarch: hasarch, hasppa: hasppa, hasdistro: hasdistro}, function(err, html){
+			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), whenDone: whenDoneCommand, hastmp: hastmp, hasarch: hasarch, hasppa: hasppa}, function(err, html){
 				db.scripts.findOne({md5:md5(html)},function(err, docs){
 					if (docs){
 						res.send(generateWgetCommand(docs.uid, host));
@@ -182,11 +229,15 @@ router.post('/generate', function(req, res){
 }
 });
 router.post('/api/apps', function(req, res){
-	db.apps.find({type:'app'},{name:1, imageType: 1, desc: 1}).sort({name:1} ,function(err, docs){
+	db.apps.find({'command.distros':req.cookies.distro, type:'app'},{name:1, imageType: 1, desc: 1}).sort({name:1} ,function(err, docs){
 		res.json(docs);
 	});
 });
-
+router.post('/api/distros', function(req, res){
+	db.distros.find(function(err, docs){
+		res.json(docs);
+	});
+});
 router.get('/image/:id', function(req, res){
 	db.apps.findOne({_id: new mongojs.ObjectId(req.params.id)}, function (error, result) {
 		if (error)
@@ -284,16 +335,26 @@ router.post('/admin/upsert/:id?', function(req, res){
 				input.image = image
 				input.imageType = files.image[0].headers['content-type'];
 			}
-			
 			input.name = fields.name.toString();
 			input.echo = fields.echo.toString();
-			input.command = fields.command.toString();
-			input.command = input.command.replace(/\r\n/g,"\n");
-			input.ppa = fields.ppa.toString();
-			input.ppa = input.ppa.replace(/\r\n/g,"\n");
+
+			input.command = [];
+			if (fields.command) {
+				console.log("commands");
+				fields['command'].forEach(function(item, index){
+					input.command[index] = {'distros':fields.distros[index].split(','),'command':item.replace(/\r\n/g,"\n")};
+				});
+			}
+			input.ppa = [];
+			if (fields.ppa){
+				fields['ppa'].forEach(function(item, index){
+					input.ppa[index] = {'distros':fields.pdistros[index].split(','), 'ppa':item.replace(/\r\n/g,"\n")};
+				});
+			}
 			input.desc = fields.desc.toString();
 			input.type = fields.type.toString();
 			input.link = fields.link.toString();
+			console.log(JSON.stringify(input));
 			if (req.params.id) {
 				db.apps.update(
 					{_id: new mongojs.ObjectId(req.params.id)},
@@ -313,28 +374,28 @@ router.post('/admin/upsert/:id?', function(req, res){
 					});
 			}
 		});
-	});
+});
 });
 router.get('/everything', function(req,res){
 	
 	var host = "oduso.com";
 	
-		db.apps.find(function(err, docs){
-			var ppas = [];
-			docs.forEach(function(element, index, array){
-				if (element.ppa) {
-					if (element.ppa.match(/^ppa:/))
-						element.ppa = "apt-add-repository "+element.ppa+" -y";
-					ppas.push(element.ppa);
-				}
-			});
-			
-			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: true, hasdistro: true}, function(err, html){
-				res.set('Content-Type', 'text/plain');
-				var script = html.replace(/&>.\/dev\/null/g, "> /dev/null 2>> ~/oduso-everything.txt").replace("2>>", "2>");
-				res.send(script);
-			});
+	db.apps.find(function(err, docs){
+		var ppas = [];
+		docs.forEach(function(element, index, array){
+			if (element.ppa) {
+				if (element.ppa.match(/^ppa:/))
+					element.ppa = "apt-add-repository "+element.ppa+" -y";
+				ppas.push(element.ppa);
+			}
 		});
+
+		res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: true, hasdistro: true}, function(err, html){
+			res.set('Content-Type', 'text/plain');
+			var script = html.replace(/&>.\/dev\/null/g, "> /dev/null 2>> ~/oduso-everything.txt").replace("2>>", "2>");
+			res.send(script);
+		});
+	});
 
 });
 function isLoggedIn(req, res, next) {

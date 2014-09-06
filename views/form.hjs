@@ -1,0 +1,63 @@
+<form id="mainForm" action="/generate" method="post" data-persist="garlic" data-destroy="false">
+<div class="apps type">
+<h2>Apps</h2>
+    <input id="ms" name="apps[]"/>
+    <!--<h3> App suggestions</h3>
+    some suggestions here-->
+</div>
+{{#types}}
+  <div class="icons type">
+    <h2>Icons</h2>
+    {{#icon}}
+    <div>
+      <label><input type="checkbox" name="icons[]" value="{{_id}}"><span>{{name}}</span></label>
+      {{#imageType}}
+        <img src="/image/{{_id}}" data-toggle="popover" data-content="{{desc}}{{#link}}<a href='{{link}}' target='_blank'>More Info</a>{{/link}}" tabindex="-1">
+      {{/imageType}}
+    </div>
+
+    {{/icon}}
+    {{^icon}}
+      <span>There are no icons.</span>
+    {{/icon}}
+  </div>
+  <div class="themes type">
+    <h2>Themes</h2>
+    {{#theme}}
+    <div>
+      <label><input type="checkbox" name="themes[]" value="{{_id}}"><span>{{name}}</span></label> 
+      {{#imageType}}
+        <img src="/image/{{_id}}" data-toggle="popover" data-content="{{desc}}{{#link}}<a href='{{link}}' target='_blank'>More Info</a>{{/link}}" tabindex="-1">
+      {{/imageType}}
+      
+    </div>
+    {{/theme}}
+    {{^theme}}
+      <span>There are no themes.</span>
+    {{/theme}}
+  </div>
+  <div class="misc type">
+    <h2>Miscellaneous</h2>
+    {{#misc}}
+    <div>
+      <label><input type="checkbox" name="apps[]" value="{{_id}}"><span>{{name}}</span></label>
+      {{#imageType}}
+        <img src="/image/{{_id}}">
+      {{/imageType}}
+    </div>
+    {{/misc}}
+    {{^misc}}
+      <span>There are no miscellaneous items.</span>
+    {{/misc}}
+  </div>
+  <select id="whenDone" name="whenDone">
+      <option value="" selected="">Do Nothing</option>
+      <option value="Rebooting">Reboot</option>
+      <option value="Shutting Down">Shutdown</option>
+      <option value="Suspending">Suspend</option>
+      <option value="Hibernating">Hibernate</option>
+    </select>
+    <span> after executing the script.</span>
+{{/types}}
+<button class="generate btn btn-default btn-lg" type="submit">Generate</button>
+</form>

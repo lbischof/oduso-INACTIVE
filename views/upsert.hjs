@@ -3,13 +3,24 @@
   <head>
     <title>{{ title }}</title>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/bootstrap-tagsinput.css" />
+    <!--<link rel="stylesheet" href="/stylesheets/style.css" />-->
   </head>
   <body>
 <style>
 body {
   margin: 50px;
 }
+fieldset {
+    padding: 20px;
+    margin: 5px;
+    color: black;
+    border: solid black 1px;
+    border-radius: 4px;
+}
+.bootstrap-tagsinput {
+display: block;
+  }
 </style>
   <a class="remove" href="/admin/remove/{{doc._id}}" onclick="return confirm('Remove {{doc.name}}?')">Remove</a>
  <p>$tmp = /tmp/infinity<br>$arch = amd64 or i386<br>$distro = freya, precise, trusty<br>if [[ $distro == "freya" ]]; then (elif, else, fi)</p>
@@ -26,14 +37,43 @@ body {
   <label>Description</label>
   <input name="desc" type="text" class="form-control" value="{{doc.desc}}" required>
 </div>
-<div class="form-group">
-  <label>PPA</label>
-  <textarea name="ppa" class="form-control">{{doc.ppa}}</textarea>
+<div class="form-group ppa">
+  <label>PPAs</label>
+{{{doc.ppa}}}
+ {{#doc.ppa}}
+  <fieldset>
+    <div class="form-group">
+    <label>Distros</label>
+    <input name="pdistros" type="text" class="form-control" value="{{{distros}}}" data-role="tagsinput" >
+    <label>PPA</label>
+    <textarea name="ppa" class="form-control" required>{{{ppa}}}</textarea>
+    </div>
+    <button class="remove">Remove</button>
+    </fieldset>
+  {{/doc.ppa}}
+    <button data-type="ppa" class="add">Add</button>
+</div>
+
 </div>
 <div class="form-group">
-  <label>Command</label>
-  <textarea name="command" class="form-control" required>{{doc.command}}</textarea>
+  <label>Commands</label>
+  {{{doc.command}}}
+  {{#doc.command}}
+  <fieldset>
+    <div class="form-group">
+    <label>Distros</label>
+    <input name="distros" type="text" class="form-control" value="{{{distros}}}" data-role="tagsinput" >
+    <label>Command</label>
+    <textarea name="command" class="form-control" required>{{{command}}}</textarea>
+    </div>
+    <button class="remove">Remove</button>
+    </fieldset>
+  {{/doc.command}}
+  <button data-type="command" class="add">Add</button>
 </div>
+  
+
+
 <div class="form-group">
   <label>Link to more info</label>
   <input type="text" name="link" class="form-control" value="{{doc.link}}">
@@ -58,7 +98,7 @@ body {
 </form>
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <script src="/javascripts/magicsuggest-min.js"></script>
+    <script src="/javascripts/bootstrap-tagsinput.js"></script>
     <script src="/javascripts/jquery.autosize.min.js"></script>
 <script>
 $(function(){
@@ -66,7 +106,19 @@ $(function(){
   $('.type').val("{{doc.type}}");
   {{/doc.type}}
   $('textarea').autosize();
+  $('.add').on( "click", function(e) {
+    type = $(this).data("type");
+    dtype = type == "ppa" ? "pdistros" : "distros";
+    $(this).before('<fieldset><div class="form-group"><label>Distros</label><input name="'+ dtype +'" type="text" class="form-control tags"><label>'+type+'</label><textarea name="'+type+'" class="form-control"></textarea></div><button class="remove">Remove</button></fieldset>');
+    $('.tags').tagsinput();
+    e.preventDefault();
+  });
+  $('body').on( "click", ".remove", function(e) {
+    $(this).parents('fieldset').remove();
+    e.preventDefault();
 });
-</script
+});
+
+</script>
   </body>
   </html>
