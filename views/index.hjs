@@ -13,11 +13,20 @@
 <section>
 <h1 class="logo">~$ {{ title }}_</h1>
 <p>{{ title }} is a tool to quickly install apps, themes and tweaks. Just select the apps that you would like to install and paste the generated command into the terminal.</p>
+
+<div class="distro">
 <h2>Distro</h2>
-<select class="distro">
-<option value="freya">freya</option>
-<option value="luna">luna</option>
+<p>Please select you distribution version. If you don't know this please run <span class="noselect"></span>lsb_release -d<span class="noselect"></span> in your terminal.</p>
+<form data-persist="garlic" method="POST">
+<select class="distroselect">
+<option value="freya">elementary Freya</option>
+<option value="luna">elementary Luna</option>
+<option value="trusty">Ubuntu Trusty 14.04</option>
+<option value="precise">Ubuntu Precise 12.04</option>
 </select>
+</form>
+</div>
+
 <div id="form">
 </div>
 

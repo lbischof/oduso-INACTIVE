@@ -1,10 +1,7 @@
 $(function() {
     $(".logo").fitText(0.7, {maxFontSize: '100px'});
 
-    var savedItems = localStorage.getItem('ms');
-    if (savedItems) {
-        //ms.setSelection(JSON.parse(localStorage.getItem('ms')));
-    }
+    
     $('#form').on('submit','#mainForm',function(e){
         $(this).find (':submit').attr ('disabled', 'disabled');
         $.ajax({
@@ -34,10 +31,9 @@ $('#generatedCommand').on( "mousedown", function(){
     return false;
 });
 function SelectText(element) {
-    var doc = document
-    , text = doc.getElementById(element)
-    , range, selection
-    ;
+    var doc = document,
+    text = doc.getElementById(element),
+    range, selection;
     if (doc.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
@@ -50,7 +46,14 @@ function SelectText(element) {
         selection.addRange(range);
     }
 }
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
 function ReloadPlugins(){
+$('#mainForm').garlic();
+
 var ms = $('#ms').magicSuggest({
     data: 'api/apps',
     valueField: '_id',
@@ -78,20 +81,31 @@ var ms = $('#ms').magicSuggest({
         return '<span class="item" data-toggle="tooltip" title="'+data.desc+'">'+img + name+'</span>';
     }
 });
+var distro = getCookie("distro");
+if (distro === undefined) {
+    distro = "freya";
+    $('.distroselect').garlic( 'destroy' );
+    $('.distroselect').val("freya");
+}
 $(ms).on('selectionchange', function(e,m){
     $('#mainForm').find (':submit').removeAttr ('disabled');
-    localStorage.setItem('ms',JSON.stringify(this.getSelection()));
+    localStorage.setItem('ms'+distro,JSON.stringify(this.getSelection()));
     console.log(JSON.stringify(this.getSelection()));
     $('#generated').fadeTo(400, 0, function(){
         $(this).css({visibility: "hidden"});
     });
 });
-$('#mainForm').garlic();
+var savedItems = localStorage.getItem('ms'+distro);
+    if (savedItems) {
+        ms.setSelection(JSON.parse(savedItems));
+    }
 }
 
-$('.distro').change(function() {
-    $("#form").load("/form", {distro: $(this).val()}, ReloadPlugins);
+$('.distroselect').change(function() {
+    var distro = $(this).val();
+    $("#form").load("/form", {distro: distro}, ReloadPlugins);
 });
+$("#form").load("/form", {}, ReloadPlugins);
 
 $('#form').on('change', '#mainForm',function (e) {
     $(this).find (':submit').removeAttr ('disabled');

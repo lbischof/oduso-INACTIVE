@@ -52,34 +52,24 @@ passport.use(new LocalStrategy(
 /* GET home page. */
 
 router.get('/', function(req, res) {
-
-  // check if client sent cookie
-  var cookie = req.cookies.distro;
-  if (cookie === undefined)
-  {
-  	res.cookie('distro','freya', { maxAge: 900000, httpOnly: false });
-  	console.log('cookie have created successfully');
-	getApps("freya", function(types){
-    	res.render('index', {title: 'oduso', types: types, distro: cookie});
-    });  
-} 
-  else
-  {
-    // yes, cookie was already present 
-    console.log('cookie exists', cookie);
-    getApps(cookie, function(types){
-    	res.render('index', {title: 'oduso', types: types});
-    });
-  } 
+    res.render('index', {title: 'oduso'});
 });
 router.post('/form', function(req, res){
-	var distro = req.body.distro;
-	if (distro){
-		getApps(distro, function(types){
-			console.log(types);
-    	res.render('form', {types: types});
-    }); 
+	if (req.body.distro){
+		global.distro = req.body.distro;
+		var forever = 60*60*24*365;
+		res.cookie('distro',global.distro, { maxAge: forever, httpOnly: false });
+		console.log("Set cookie because param was set");
+	} else if (req.cookies.distro) {
+		global.distro = req.cookies.distro;
+		console.log("Cookie already set");
+	} else {
+		global.distro = "freya";
+		console.log("Defaulting to freya");
 	}
+	getApps(global.distro, function(types){
+		res.render('form', {types: types});
+	}); 
 });
 router.get('/oduso-:id.sh/:option?',function(req, res){
 	db.scripts.findOne({uid: req.params.id}, function (error, result) {
@@ -188,16 +178,18 @@ router.post('/generate', function(req, res){
 
 					if (element.command.length > 0){
 						array[index].command = element.command.filter(function(element){
-							return element.distros.contains("freya");
+							return element.distros.contains(global.distro);
 						})[0].command;
 					}
 					console.log(JSON.stringify(element.ppa));
 					if (element.ppa.length > 0){
 						array[index].ppa = element.ppa.filter(function(element){
-							return element.distros.contains("freya");
+							console.log(JSON.stringify(element));
+							return element.distros.contains(global.distro);
 						})[0].ppa;
 					}
-					
+					console.log(JSON.stringify(array[index].ppa));
+
 					if (array[index].ppa) {
 					if (array[index].ppa.match(/^ppa:/))
 						array[index].ppa = "apt-add-repository "+array[index].ppa+" -y";
@@ -234,11 +226,11 @@ router.post('/api/apps', function(req, res){
 		res.json(docs);
 	});
 });
-router.post('/api/distros', function(req, res){
+/*router.post('/api/distros', function(req, res){
 	db.distros.find(function(err, docs){
 		res.json(docs);
 	});
-});
+});*/
 router.get('/image/:id', function(req, res){
 	db.apps.findOne({_id: new mongojs.ObjectId(req.params.id)}, function (error, result) {
 		if (error)
