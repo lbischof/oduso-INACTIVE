@@ -72,10 +72,10 @@ router.get('/', function(req, res) {
     });
   } 
 });
-router.get('/form', function(req, res){
-	if (req.query.distro){
-		console.log(req.query.distro);
-		getApps(req.query.distro, function(types){
+router.post('/form', function(req, res){
+	var distro = req.body.distro;
+	if (distro){
+		getApps(distro, function(types){
 			console.log(types);
     	res.render('form', {types: types});
     }); 
@@ -174,7 +174,7 @@ router.post('/generate', function(req, res){
 	var whenDone = req.body.whenDone;
 	var whenDoneCommand = getCommand(whenDone);
 	var host = req.get('host');
-	if (ids[0] != null){
+	if (ids.length > 0){
 		ids = ids.map(function(id) { return mongojs.ObjectId(id); });
 		db.apps.find({_id: {$in: ids}}, {_id: 0}, function(err, docs){
 			var ppas = [];

@@ -7,7 +7,6 @@ $(function() {
     }
     $('#form').on('submit','#mainForm',function(e){
         $(this).find (':submit').attr ('disabled', 'disabled');
-        alert($(this).serialize());
         $.ajax({
           type: "POST",
           url: $(this).attr('action'),
@@ -51,36 +50,34 @@ function SelectText(element) {
         selection.addRange(range);
     }
 }
-$('.distro').change(function() {
-    $.get("form", {distro: $(this).val()}, function(data){
-        $("#form").html(data);
-        var ms = $('#ms').magicSuggest({
-            data: 'api/apps',
-            valueField: '_id',
-            displayField: 'name',
-            allowFreeEntries: false,
-            selectionPosition: 'bottom',
-            typeDelay: 0,
-            inputCfg: {"data-storage":"false"},
-            highlight: false,
-            maxSelection: null,
-            useTabKey: true,
-            placeholder: 'Search for apps',
-            renderer: function(data){
-                var img = '';
-                var desc = '<span>'+data.desc+'</span>';
-                if (data.imageType)
-                    img = '<img height="22" style="margin-right: 5px" src="/image/' + data._id + '">';
-                return img + data.name + desc;
-            },
-            selectionRenderer: function(data){
-                var img = '';
-                var name = '<span>'+data.name+'</sapn>';
-                if (data.imageType)
-                    img = '<img height="22" style="margin-right: 5px" src="/image/' + data._id + '">';
-                return '<span class="item" data-toggle="tooltip" title="'+data.desc+'">'+img + name+'</span>';
-            }
-        });
+function ReloadPlugins(){
+var ms = $('#ms').magicSuggest({
+    data: 'api/apps',
+    valueField: '_id',
+    displayField: 'name',
+    allowFreeEntries: false,
+    selectionPosition: 'bottom',
+    typeDelay: 0,
+    inputCfg: {"data-storage":"false"},
+    highlight: false,
+    maxSelection: null,
+    useTabKey: true,
+    placeholder: 'Search for apps',
+    renderer: function(data){
+        var img = '';
+        var desc = '<span>'+data.desc+'</span>';
+        if (data.imageType)
+            img = '<img height="22" style="margin-right: 5px" src="/image/' + data._id + '">';
+        return img + data.name + desc;
+    },
+    selectionRenderer: function(data){
+        var img = '';
+        var name = '<span>'+data.name+'</sapn>';
+        if (data.imageType)
+            img = '<img height="22" style="margin-right: 5px" src="/image/' + data._id + '">';
+        return '<span class="item" data-toggle="tooltip" title="'+data.desc+'">'+img + name+'</span>';
+    }
+});
 $(ms).on('selectionchange', function(e,m){
     $('#mainForm').find (':submit').removeAttr ('disabled');
     localStorage.setItem('ms',JSON.stringify(this.getSelection()));
@@ -89,7 +86,11 @@ $(ms).on('selectionchange', function(e,m){
         $(this).css({visibility: "hidden"});
     });
 });
-});
+$('#mainForm').garlic();
+}
+
+$('.distro').change(function() {
+    $("#form").load("/form", {distro: $(this).val()}, ReloadPlugins);
 });
 
 $('#form').on('change', '#mainForm',function (e) {
@@ -98,7 +99,12 @@ $('#form').on('change', '#mainForm',function (e) {
         $(this).css({visibility: "hidden"});
     });
 });
-$('[data-toggle="popover"]').popover({'placement': 'top', trigger: 'focus', html: true});
+$('body').popover({
+    placement: 'top',
+    trigger: 'focus', 
+    html: true,
+    selector: '[data-toggle="popover"]'
+});
 $('body').tooltip({
     selector: '[data-toggle="tooltip"]',
     delay: {show: 500, hide: 0}
