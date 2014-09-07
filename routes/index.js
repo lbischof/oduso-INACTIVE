@@ -226,11 +226,15 @@ router.post('/api/apps', function(req, res){
 		res.json(docs);
 	});
 });
-/*router.post('/api/distros', function(req, res){
-	db.distros.find(function(err, docs){
-		res.json(docs);
+router.get('/api/distros/:query?', function(req, res){
+	db.distros.find({"value": new RegExp(req.params.query) },{value:1,_id:0}, function(err, docs){
+	var items = [];
+	docs.forEach(function(element, index){
+		items.push(element.value);
 	});
-});*/
+res.json(items);
+	});
+});
 router.get('/image/:id', function(req, res){
 	db.apps.findOne({_id: new mongojs.ObjectId(req.params.id)}, function (error, result) {
 		if (error)

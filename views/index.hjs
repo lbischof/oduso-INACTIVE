@@ -19,8 +19,8 @@
 <p>Please select you distribution version. If you don't know this please run <span class="noselect"></span>lsb_release -d<span class="noselect"></span> in your terminal.</p>
 <form data-persist="garlic" method="POST">
 <select class="distroselect">
-<option value="freya">elementary Freya</option>
-<option value="luna">elementary Luna</option>
+<option value="freya">elementary OS Freya</option>
+<option value="luna">elementary OS Luna</option>
 <option value="trusty">Ubuntu Trusty 14.04</option>
 <option value="precise">Ubuntu Precise 12.04</option>
 </select>

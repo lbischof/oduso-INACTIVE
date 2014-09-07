@@ -24,7 +24,7 @@ display: block;
 </style>
   <a class="remove" href="/admin/remove/{{doc._id}}" onclick="return confirm('Remove {{doc.name}}?')">Remove</a>
  <p>$tmp = /tmp/infinity<br>$arch = amd64 or i386<br>$distro = freya, precise, trusty<br>if [[ $distro == "freya" ]]; then (elif, else, fi)</p>
-<form method="POST" enctype="multipart/form-data" action="/admin/upsert/{{doc._id}}">
+<form id="formid" method="POST" enctype="multipart/form-data" action="/admin/upsert/{{doc._id}}">
 <div class="form-group">
   <label>Name</label>
   <input name="name" type="text" class="form-control" value="{{doc.name}}" required>
@@ -44,14 +44,14 @@ display: block;
   <fieldset>
     <div class="form-group">
     <label>Distros</label>
-    <input name="pdistros" type="text" class="form-control" value="{{{distros}}}" data-role="tagsinput" >
+    <input name="pdistros" type="text" class="form-control tags" value="{{{distros}}}">
     <label>PPA</label>
     <textarea name="ppa" class="form-control" required>{{{ppa}}}</textarea>
     </div>
-    <button class="remove">Remove</button>
+    <a class="remove">Remove</a>
     </fieldset>
   {{/doc.ppa}}
-    <button data-type="ppa" class="add">Add</button>
+    <a data-type="ppa" class="add">Add</a>
 </div>
 
 </div>
@@ -62,14 +62,14 @@ display: block;
   <fieldset>
     <div class="form-group">
     <label>Distros</label>
-    <input name="distros" type="text" class="form-control" value="{{{distros}}}" data-role="tagsinput" >
+    <input name="distros" type="text" class="form-control tags" value="{{{distros}}}" >
     <label>Command</label>
     <textarea name="command" class="form-control" required>{{{command}}}</textarea>
     </div>
-    <button class="remove">Remove</button>
+    <a class="remove">Remove</a>
     </fieldset>
   {{/doc.command}}
-  <button data-type="command" class="add">Add</button>
+  <a data-type="command" class="add">Add</a>
 </div>
   
 
@@ -98,10 +98,21 @@ display: block;
 </form>
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+      <script src="/javascripts/bootstrap3-typeahead.min.js"></script>
+
     <script src="/javascripts/bootstrap-tagsinput.js"></script>
     <script src="/javascripts/jquery.autosize.min.js"></script>
 <script>
 $(function(){
+
+ $('#formid').bind("keyup keypress", function(e) {
+  var code = e.keyCode || e.which; 
+  if (code  == 13) {               
+    e.preventDefault();
+    return false;
+  }
+});
+  enableTags();
   {{#doc.type}}
   $('.type').val("{{doc.type}}");
   {{/doc.type}}
@@ -109,14 +120,24 @@ $(function(){
   $('.add').on( "click", function(e) {
     type = $(this).data("type");
     dtype = type == "ppa" ? "pdistros" : "distros";
-    $(this).before('<fieldset><div class="form-group"><label>Distros</label><input name="'+ dtype +'" type="text" class="form-control tags"><label>'+type+'</label><textarea name="'+type+'" class="form-control"></textarea></div><button class="remove">Remove</button></fieldset>');
-    $('.tags').tagsinput();
+    $(this).before('<fieldset><div class="form-group"><label>Distros</label><input name="'+ dtype +'" type="text" class="form-control tags"><label>'+type+'</label><textarea name="'+type+'" class="form-control"></textarea></div><a class="remove">Remove</a></fieldset>');
+      enableTags();
+    
     e.preventDefault();
   });
   $('body').on( "click", ".remove", function(e) {
     $(this).parents('fieldset').remove();
     e.preventDefault();
 });
+  function enableTags(){
+    $('.tags').tagsinput({
+      trimValue: true,
+      typeahead: {
+       source: ["luna","freya","precise","trusty"]      
+      },
+      freeInput: false
+  });
+  }
 });
 
 </script>
