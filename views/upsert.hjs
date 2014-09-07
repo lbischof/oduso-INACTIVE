@@ -105,7 +105,7 @@ display: block;
 <script>
 $(function(){
 
- $('#formid').bind("keyup keypress", function(e) {
+ $('input').bind("keyup keypress", function(e) {
   var code = e.keyCode || e.which; 
   if (code  == 13) {               
     e.preventDefault();

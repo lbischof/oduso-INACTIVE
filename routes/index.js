@@ -190,7 +190,7 @@ router.post('/generate', function(req, res){
 					}
 					console.log(JSON.stringify(array[index].ppa));
 
-					if (array[index].ppa) {
+					if (element.ppa.length > 0) {
 					if (array[index].ppa.match(/^ppa:/))
 						array[index].ppa = "apt-add-repository "+array[index].ppa+" -y";
 					ppas.push(array[index].ppa);
