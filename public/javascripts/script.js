@@ -1,7 +1,11 @@
 $(function() {
     $(".logo").fitText(0.7, {maxFontSize: '100px'});
     $('.distroselect').selectpicker();
-    
+    $('#dsForm').garlic({
+      onRetrieve: function ( elem, retrievedValue ) {
+          $('.distroselect').selectpicker('refresh');
+      }
+    });
     $('#form').on('submit','#mainForm',function(e){
         $(this).find (':submit').attr ('disabled', 'disabled');
         $.ajax({

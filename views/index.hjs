@@ -18,7 +18,7 @@
 <div class="distro">
 <h2>Distro</h2>
 <p>Please select you distribution version. If you don't know this please run <span class="noselect"></span>lsb_release -d<span class="noselect"></span> in your terminal.</p>
-<form data-persist="garlic" method="POST">
+<form id="dsForm" method="POST">
 <select class="distroselect">
   <optgroup label="elementary OS">
     <option value="freya">Freya</option>
