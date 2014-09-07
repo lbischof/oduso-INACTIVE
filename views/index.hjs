@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/magicsuggest-min.css" />
+    <link rel="stylesheet" href="/stylesheets/bootstrap-select.min.css" />
     <link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
@@ -19,10 +20,15 @@
 <p>Please select you distribution version. If you don't know this please run <span class="noselect"></span>lsb_release -d<span class="noselect"></span> in your terminal.</p>
 <form data-persist="garlic" method="POST">
 <select class="distroselect">
-<option value="freya">elementary OS Freya</option>
-<option value="luna">elementary OS Luna</option>
-<option value="trusty">Ubuntu Trusty 14.04</option>
-<option value="precise">Ubuntu Precise 12.04</option>
+  <optgroup label="elementary OS">
+    <option value="freya">Freya</option>
+    <option value="luna">Luna</option>
+  </optgroup>
+  <optgroup label="Ubuntu">
+    <option value="trusty">Trusty 14.04</option>
+    <option value="precise">Precise 12.04</option>
+  </optgroup>
+
 </select>
 </form>
 </div>
@@ -46,9 +52,10 @@
 <a href="news">News</a>
 <a href="support">Support</a>
 </footer>-->
-	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-      <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script src="/javascripts/magicsuggest-min.js"></script>
+    <script src="/javascripts/bootstrap-select.min.js"></script>
     <script src="/javascripts/garlic.min.js"></script>
     <script src="/javascripts/jquery.fittext.js"></script>
     <script src="/javascripts/script.js"></script>

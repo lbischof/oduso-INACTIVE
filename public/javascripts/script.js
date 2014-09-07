@@ -1,6 +1,6 @@
 $(function() {
     $(".logo").fitText(0.7, {maxFontSize: '100px'});
-
+    $('.distroselect').selectpicker();
     
     $('#form').on('submit','#mainForm',function(e){
         $(this).find (':submit').attr ('disabled', 'disabled');
