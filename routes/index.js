@@ -222,7 +222,7 @@ router.post('/generate', function(req, res){
 }
 });
 router.post('/api/apps', function(req, res){
-	db.apps.find({'command.distros':req.cookies.distro, type:'app'},{name:1, imageType: 1, desc: 1}).sort({name:1} ,function(err, docs){
+	db.apps.find({'command.distros':global.distro, type:'app'},{name:1, imageType: 1, desc: 1}).sort({name:1} ,function(err, docs){
 		res.json(docs);
 	});
 });
