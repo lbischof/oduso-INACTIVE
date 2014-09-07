@@ -186,12 +186,13 @@ router.post('/generate', function(req, res){
 			var command;
 			docs.forEach(function(element, index, array){
 
-					if (element.command[0] != null){
+					if (element.command.length > 0){
 						array[index].command = element.command.filter(function(element){
 							return element.distros.contains("freya");
 						})[0].command;
 					}
-					if (element.ppa[0] != null){
+					console.log(JSON.stringify(element.ppa));
+					if (element.ppa.length > 0){
 						array[index].ppa = element.ppa.filter(function(element){
 							return element.distros.contains("freya");
 						})[0].ppa;
