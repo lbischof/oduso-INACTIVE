@@ -1,14 +1,11 @@
 var express = require('express');
-var MongoDb = require("mongodb");
-var mongojs = require('mongojs');
-var fs = require('fs');
-var multiparty = require('multiparty');
 var router = express.Router();
-var bcrypt = require('bcrypt-nodejs');
+
+var mongojs = require('mongojs');
 var connection_string = '127.0.0.1:27017/oduso';
-var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
 var md5 = require('MD5');
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
+var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
 
 
 // if OPENSHIFT env variables are present, use the available connection info:
@@ -21,38 +18,12 @@ if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
 }
 var db = mongojs(connection_string, ['apps','users','scripts','distros']);
 
-passport.serializeUser(function(user, done) {
-	done(null, user);
-});
-
-passport.deserializeUser(function(user, done) {
-	done(null, user);
-});
-
-
-passport.use(new LocalStrategy(
-	function(username, password, done) {
-		db.users.findOne({ username: username }, function(err, user) {
-			if (err) { return done(err); }
-			if (!user) {
-				return done(null, false, { message: 'Incorrect username.' });
-			}
-			bcrypt.compare(password, user.password, function(err, res) {
-				if (res)
-					return done(null, user);
-
-				return done(null, false, { message: 'Incorrect password.' });
-			});
-		});
-	}
-	));
-
 
 
 /* GET home page. */
 
 router.get('/', function(req, res) {
-    res.render('index', {title: 'oduso'});
+	res.render('index', {title: 'oduso'});
 });
 router.post('/form', function(req, res){
 	if (req.body.distro){
@@ -83,83 +54,20 @@ router.get('/oduso-:id.sh/:option?',function(req, res){
 		res.send(script);
 	});
 });
-function getApps(distro, callback){
-	console.log(distro);
-db.apps.find({'command.distros':distro}, function(err,docs){ //get themes
-		var types = docs.reduce(function(buckets,doc){
-			if(!buckets[doc.type]) buckets[doc.type] = [];
-			buckets[doc.type].push(doc);
-			return buckets;
-		},{});
-		//console.log(types);
-		callback(types);
-	});
-}
-function generateUID() {
-	return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
-}
-function generateWgetCommand(uid, host){
-	var link = host+"/oduso-"+uid+".sh";
-	var output = {};
-	output.command = "wget -O - "+link+" | bash";
-	output.link = "http://"+link;
-	return JSON.stringify(output);
-}
-function ArrNoDupe(a) {
-	var temp = {};
-	for (var i = 0; i < a.length; i++)
-		temp[a[i]] = true;
-	var r = [];
-	for (var k in temp)
-		r.push(k);
-	return r;
-}
-function compare(a,b) {
-	if (a.type < b.type)
-		return -1;
-	if (a.type > b.type)
-		return 1;
-	return 0;
-}
-function getCommand(whenDone){
-	var command;
-	switch(whenDone) {
-		case "Rebooting":
-		command = "shutdown -r now";
-		break;
-		case "Shutting Down":
-		command = "shutdown -h now";
-		break;
-		case "Suspending":
-		command = "pm-suspend";
-		break;
-		case "Hibernating":
-		command = "pm-hibernate";
-		break;
-		default:
-		return false;
-	}
-	command = "echo \""+whenDone+" in 10 Seconds, CTRL + C to cancel!\"\nsleep 10\n"+command;
 
-	return command;
-}
-Array.prototype.contains = function(element){
-    return this.indexOf(element) > -1;
-};
 router.post('/generate', function(req, res){
 	var ids = [];
 	if (req.body.apps)
-	ids = req.body.apps;
+		ids = req.body.apps;
 	if (req.body.themes){
 		
 		ids = ids.concat(req.body.themes);
 		//ids.push("540747336fcf61f2a00c140a");
 	} 
 	if (req.body.icons){
-				ids = ids.concat(req.body.icons);
+		ids = ids.concat(req.body.icons);
 
 	}
-			console.log(ids);
 
 	var whenDone = req.body.whenDone;
 	var whenDoneCommand = getCommand(whenDone);
@@ -175,32 +83,17 @@ router.post('/generate', function(req, res){
 			var installTweaks = false;
 			var command;
 			docs.forEach(function(element, index, array){
-
-					if (element.command.length > 0){
-						array[index].command = element.command.filter(function(element){
-							return element.distros.contains(global.distro);
-						})[0].command;
-					}
-					console.log(JSON.stringify(element.ppa));
-					if (element.ppa.length > 0){
-						array[index].ppa = element.ppa.filter(function(element){
-							console.log(JSON.stringify(element));
-							return element.distros.contains(global.distro);
-						})[0].ppa;
-					}
-					console.log(JSON.stringify(array[index].ppa));
-
-					if (element.ppa.length > 0) {
-					if (array[index].ppa.match(/^ppa:/))
-						array[index].ppa = "apt-add-repository "+array[index].ppa+" -y";
+				array[index].command = extractValue(element, "command", distro);
+				array[index].ppa = extractValue(element, "ppa", distro);
+				if (array[index].ppa) {
 					ppas.push(array[index].ppa);
 					hasppa = true;
 				}
 			});
-			if (JSON.stringify(docs).indexOf("$tmp") > -1) 
+			if (docs.contains("$tmp")) 
 				hastmp = true;
 			
-			if (JSON.stringify(docs).indexOf("$arch") > -1) 
+			if (docs.contains("$arch")) 
 				hasarch = true;
 			
 			docs.sort(compare);
@@ -228,11 +121,11 @@ router.post('/api/apps', function(req, res){
 });
 router.get('/api/distros/:query?', function(req, res){
 	db.distros.find({"value": new RegExp(req.params.query) },{value:1,_id:0}, function(err, docs){
-	var items = [];
-	docs.forEach(function(element, index){
-		items.push(element.value);
-	});
-res.json(items);
+		var items = [];
+		docs.forEach(function(element, index){
+			items.push(element.value);
+		});
+		res.json(items);
 	});
 });
 router.get('/image/:id', function(req, res){
@@ -282,112 +175,23 @@ router.post('/register', function(req, res){
 router.get('/register', function(req, res){
 	res.render('login', {title: 'Register', flash: req.flash('error')});
 });
-/* ADMIN */
 
-
-router.get('/admin*', isLoggedIn, isAdmin);
-router.get('/admin', function(req,res) {
-	res.redirect('/admin/list');
-});
-router.get('/admin/list', function(req,res){
-	db.apps.find({},{image: 0},function(err, docs){
-		var types = docs.reduce(function(buckets,doc){
-			if(!buckets[doc.type]) buckets[doc.type] = [];
-			buckets[doc.type].push(doc);
-			return buckets;
-		},{});
-		console.log(types);
-		for(var index in types) {
-			types[index].sort(function(a, b){
-				return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-			});
-		}
-
-		res.render('list', {docs: types});
-	});
-});
-router.get('/admin/remove/:id', function(req,res){
-	db.apps.remove({_id: new mongojs.ObjectId(req.params.id)}, function(err, docs){
-		res.redirect('/admin/list');
-	});
-});
-router.get('/admin/upsert/:id?', function(req,res){
-	if (req.params.id) {
-		db.apps.findOne({_id: new mongojs.ObjectId(req.params.id)}, function(err, docs){
-			console.log(docs);
-			res.render('upsert', {doc: docs});
-		});
-	} else {
-		res.render('upsert');
-	}
-});
-
-router.post('/admin/upsert/:id?', function(req, res){	
-	var form = new multiparty.Form();
-	var input = {};
-	form.parse(req, function(err, fields, files) {
-		fs.readFile(files.image[0].path, function(err, data){
-			var image = new MongoDb.Binary(data);
-			if (image.position > 0) {
-				input.image = image
-				input.imageType = files.image[0].headers['content-type'];
-			}
-			input.name = fields.name.toString();
-			input.echo = fields.echo.toString();
-
-			input.command = [];
-			if (fields.command) {
-				console.log("commands");
-				fields['command'].forEach(function(item, index){
-					input.command[index] = {'distros':fields.distros[index].split(','),'command':item.replace(/\r\n/g,"\n")};
-				});
-			}
-			input.ppa = [];
-			if (fields.ppa){
-				fields['ppa'].forEach(function(item, index){
-					input.ppa[index] = {'distros':fields.pdistros[index].split(','), 'ppa':item.replace(/\r\n/g,"\n")};
-				});
-			}
-			input.desc = fields.desc.toString();
-			input.type = fields.type.toString();
-			input.link = fields.link.toString();
-			console.log(JSON.stringify(input));
-			if (req.params.id) {
-				db.apps.update(
-					{_id: new mongojs.ObjectId(req.params.id)},
-					{ $set:  input },
-					function(err, docs){
-						console.log(err);
-						console.log(docs);
-						res.redirect('/admin/list');
-					});
-			} else {
-				db.apps.update(
-					{name:input.name},
-					input,
-					{upsert: true},
-					function(err, docs){
-						res.redirect('/admin/list');
-					});
-			}
-		});
-});
-});
-router.get('/everything', function(req,res){
-	
+router.get('/test/:distro', function(req,res){
+	var distro = req.params.distro;
 	var host = "oduso.com";
-	
-	db.apps.find(function(err, docs){
+	var hasppa = false;
+	db.apps.find({'command.distros': distro}, function(err, docs){
 		var ppas = [];
 		docs.forEach(function(element, index, array){
-			if (element.ppa) {
-				if (element.ppa.match(/^ppa:/))
-					element.ppa = "apt-add-repository "+element.ppa+" -y";
-				ppas.push(element.ppa);
+			array[index].command = extractValue(element, "command", distro);
+			array[index].ppa = extractValue(element, "ppa", distro);
+			if (array[index].ppa) {
+				ppas.push(array[index].ppa);
+				hasppa = true;
 			}
 		});
 
-		res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: true, hasdistro: true}, function(err, html){
+		res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: hasppa, hasdistro: true}, function(err, html){
 			res.set('Content-Type', 'text/plain');
 			var script = html.replace(/&>.\/dev\/null/g, "> /dev/null 2>> ~/oduso-everything.txt").replace("2>>", "2>");
 			res.send(script);
@@ -395,21 +199,79 @@ router.get('/everything', function(req,res){
 	});
 
 });
-function isLoggedIn(req, res, next) {
-	console.log(req.url);
-	// if user is authenticated in the session, carry on 
-	if (req.isAuthenticated())
-		return next();
 
-	// if they aren't redirect them to the home page
-	res.redirect('/login');
+function getApps(distro, callback){
+	db.apps.find({'command.distros':distro}, function(err,docs){ //get themes
+		var types = docs.reduce(function(buckets,doc){
+			if(!buckets[doc.type]) buckets[doc.type] = [];
+			buckets[doc.type].push(doc);
+			return buckets;
+		},{});
+		callback(types);
+	});
 }
-
-function isAdmin(req, res, next){ 
-	if (req.isAuthenticated() && req.user.group === 'admin')
-		next();
-	else
-		res.send(401, 'Unauthorized');
+function generateUID() {
+	return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
 }
-
+function generateWgetCommand(uid, host){
+	var link = host+"/oduso-"+uid+".sh";
+	var output = {};
+	output.command = "wget -O - "+link+" | bash";
+	output.link = "http://"+link;
+	return JSON.stringify(output);
+}
+function ArrNoDupe(a) {
+	var temp = {};
+	for (var i = 0; i < a.length; i++)
+		temp[a[i]] = true;
+	var r = [];
+	for (var k in temp)
+		r.push(k);
+	return r;
+}
+function compare(a,b) {
+	if (a.type < b.type)
+		return -1;
+	if (a.type > b.type)
+		return 1;
+	return 0;
+}
+function getCommand(whenDone){
+	var command;
+	switch(whenDone) {
+		case "Rebooting":
+		command = "shutdown -r now";
+		break;
+		case "Shutting Down":
+		command = "shutdown -h now";
+		break;
+		case "Suspending":
+		command = "pm-suspend";
+		break;
+		case "Hibernating":
+		command = "pm-hibernate";
+		break;
+		default:
+		return false;
+	}
+	command = "echo \""+whenDone+" in 10 Seconds, CTRL + C to cancel!\"\nsleep 10\n"+command;
+	return command;
+}
+Array.prototype.contains = function(element){
+	return this.indexOf(element) > -1;
+};
+function extractValue(source, type, distro){
+	var filtered = [];
+	filtered = source[type].filter(function(element){
+		return element.distros.contains(distro); //filter out the elements that aren't targeted at the distro
+	});
+	if (filtered.length > 0){ //check if the filter returned an element
+		var value = filtered[0][type];
+		if (type == "ppa" && value.match(/^ppa:/))
+			value = "apt-add-repository "+value+" -y";
+		return value; //return the end value
+	} else {
+		return false;
+	}
+}
 module.exports = router;

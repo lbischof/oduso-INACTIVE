@@ -117,6 +117,12 @@ $('#form').on('change', '#mainForm',function (e) {
         $(this).css({visibility: "hidden"});
     });
 });
+$('#dsForm').on('change', function(e){
+    $('#mainForm').find(':submit').removeAttr('disabled');
+    $('#generated').fadeTo(400, 0, function(){
+        $(this).css({visibility: "hidden"});
+    });
+});
 $('body').popover({
     placement: 'top',
     trigger: 'focus', 

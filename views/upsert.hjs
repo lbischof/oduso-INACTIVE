@@ -39,7 +39,6 @@ display: block;
 </div>
 <div class="form-group ppa">
   <label>PPAs</label>
-{{{doc.ppa}}}
  {{#doc.ppa}}
   <fieldset>
     <div class="form-group">
@@ -57,7 +56,6 @@ display: block;
 </div>
 <div class="form-group">
   <label>Commands</label>
-  {{{doc.command}}}
   {{#doc.command}}
   <fieldset>
     <div class="form-group">
