@@ -46,7 +46,7 @@ passport.use(new LocalStrategy(
 			});
 		});
 	}
-	));
+));
 
 
 router.get('*', isLoggedIn, isAdmin);
@@ -128,10 +128,10 @@ router.post('/upsert/:id?', function(req, res){
 					{upsert: true},
 					function(err, docs){
 						res.redirect('/admin/list');
-					});
+				});
 			}
 		});
-});
+	});
 });
 
 
