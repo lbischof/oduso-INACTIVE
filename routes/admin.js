@@ -122,10 +122,8 @@ router.post('/upsert/:id?', function(req, res){
 						res.redirect('/admin/list');
 					});
 			} else {
-				db.apps.update(
-					{name:input.name},
+				db.apps.insert(
 					input,
-					{upsert: true},
 					function(err, docs){
 						res.redirect('/admin/list');
 				});
