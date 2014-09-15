@@ -16,10 +16,14 @@ tmp=${TMPDIR-/tmp}
 [[ $(uname -m) == x86_64 ]] && arch=amd64 || arch=i386
 
 {{/hasarch}}
-{{#hasdistro}}
 distro=$(lsb_release -c | cut -f2)
-
-{{/hasdistro}}
+targetDistro={{distro}}
+if [ "$distro" != "$targetDistro" ]; then
+  echo "Wrong Distribution!"
+  echo "You are using $distro, this script was made for $targetDistro."
+  echo "Please visit oduso.com"
+  exit 1
+fi
 #use sudo rights for the whole script
 sudo -s <<ODUSO
 

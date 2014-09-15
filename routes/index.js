@@ -96,7 +96,7 @@ router.post('/generate', function(req, res){
 			
 			docs.sort(compare);
 			
-			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), whenDone: whenDoneCommand, hastmp: hastmp, hasarch: hasarch, hasppa: hasppa}, function(err, html){
+			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), whenDone: whenDoneCommand, hastmp: hastmp, hasarch: hasarch, hasppa: hasppa, distro: distro}, function(err, html){
 				db.scripts.findOne({md5:md5(html)},function(err, docs){
 					if (docs){
 						res.send(generateWgetCommand(docs.uid, host));
