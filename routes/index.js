@@ -79,22 +79,20 @@ router.post('/generate', function(req, res){
 			var hastmp = false;
 			var hasarch = false;
 			var hasppa = false;
-			var hasdistro = false;
 			var installTweaks = false;
 			var command;
 			docs.forEach(function(element, index, array){
 				array[index].command = extractValue(element, "command", distro);
+				if (array[index].command.indexOf("$tmp") > -1)
+					hastmp = true;
+				if (array[index].command.indexOf("$arch") > -1) 
+					hasarch = true;
 				array[index].ppa = extractValue(element, "ppa", distro);
 				if (array[index].ppa) {
 					ppas.push(array[index].ppa);
 					hasppa = true;
 				}
 			});
-			if (docs.contains("$tmp")) 
-				hastmp = true;
-			
-			if (docs.contains("$arch")) 
-				hasarch = true;
 			
 			docs.sort(compare);
 			
