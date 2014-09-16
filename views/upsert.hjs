@@ -23,7 +23,7 @@ display: block;
   }
 </style>
   <a class="remove" href="/admin/remove/{{doc._id}}" onclick="return confirm('Remove {{doc.name}}?')">Remove</a>
- <p>$tmp = /tmp/infinity<br>$arch = amd64 or i386<br>$distro = freya, precise, trusty<br>if [[ $distro == "freya" ]]; then (elif, else, fi)</p>
+ <p>$tmp = /tmp/infinity<br>$arch = amd64 or i386</p>
 <form id="formid" method="POST" enctype="multipart/form-data" action="/admin/upsert/{{doc._id}}">
 <div class="form-group">
   <label>Name</label>

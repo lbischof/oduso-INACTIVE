@@ -54,7 +54,7 @@ router.get('/', function(req,res) {
 	res.redirect('/admin/list');
 });
 router.get('/list', function(req,res){
-	db.apps.find({},{image: 0},function(err, docs){
+	/*db.apps.find({},{image: 0},function(err, docs){
 		var types = docs.reduce(function(buckets,doc){
 			if(!buckets[doc.type]) buckets[doc.type] = [];
 			buckets[doc.type].push(doc);
@@ -64,9 +64,14 @@ router.get('/list', function(req,res){
 			types[index].sort(function(a, b){
 				return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
 			});
-		}
+		}*/
 
-		res.render('list', {docs: types});
+		res.render('list');
+	//});
+});
+router.get('/everything', function(req,res){
+	db.apps.find({},{image: 0},function(err, docs){
+		res.json(docs);
 	});
 });
 router.get('/remove/:id', function(req,res){
