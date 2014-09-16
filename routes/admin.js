@@ -105,13 +105,13 @@ router.post('/upsert/:id?', function(req, res){
 			input.command = [];
 			if (fields.command) {
 				fields['command'].forEach(function(item, index){
-					input.command[index] = {'distros':fields.distros[index].split(','),'command':item.replace(/\r\n/g,"\n")};
+					input.command[index] = {'distros':fields.distros[index].split(',').sort(),'command':item.replace(/\r\n/g,"\n")};
 				});
 			}
 			input.ppa = [];
 			if (fields.ppa){
 				fields['ppa'].forEach(function(item, index){
-					input.ppa[index] = {'distros':fields.pdistros[index].split(','), 'ppa':item.replace(/\r\n/g,"\n")};
+					input.ppa[index] = {'distros':fields.pdistros[index].split(',').sort(), 'ppa':item.replace(/\r\n/g,"\n")};
 				});
 			}
 			input.desc = fields.desc.toString();

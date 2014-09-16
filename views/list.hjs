@@ -51,7 +51,7 @@
 		<thead>
 			<tr>
 				<th>Name</th>
-				<!--<th>Desc</th>-->
+				<th>Distros</th>
 				<th>Type</th>  
 			</tr>
 		</thead>
@@ -73,21 +73,48 @@
 				},
 				"columns": [
 				{ "data": "name" },
-            //{ "data": "desc" },
-            { "data": "type" }
-            ], 
-            "createdRow": function ( row, data, index ) {
-            	$(row).attr('id', data._id);
-            },
-            "fnDrawCallback": function(){
-            	$('#table td').bind('mouseenter', function () { $(this).parent().children().each(function(){$(this).addClass('datatablerowhighlight');}); });
-            	$('#table td').bind('mouseleave', function () { $(this).parent().children().each(function(){$(this).removeClass('datatablerowhighlight');}); });
-            }
-        });
+				{ "data": "command"},
+				{ "data": "type" }
+				], 
+				"columnDefs": [ {
+					"targets": 1,
+					"data": "command",
+					"render": function ( data, type, full, meta ) {
+						var distros = [];
+						if (Array.isArray(data)){
+							
+							data.forEach(function(element, index, array){
+
+								distros = distros.concat(element.distros);
+							});
+						} 
+						distros = distros.getUnique().sort();
+						return distros;
+					}
+				} ],
+				"createdRow": function ( row, data, index ) {
+					$(row).attr('id', data._id);
+				},
+				"fnDrawCallback": function(){
+					$('#table td').bind('mouseenter', function () { $(this).parent().children().each(function(){$(this).addClass('datatablerowhighlight');}); });
+					$('#table td').bind('mouseleave', function () { $(this).parent().children().each(function(){$(this).removeClass('datatablerowhighlight');}); });
+				}
+			});
 			$('#table').on('click', 'tbody > tr', function(){
 				window.location.href = "/admin/upsert/"+$(this).attr('id');
 			});
-			$('div.dataTables_filter input').focus()
+			$('div.dataTables_filter input').focus();
+			Array.prototype.getUnique = function(){
+				var u = {}, a = [];
+				for(var i = 0, l = this.length; i < l; ++i){
+					if(u.hasOwnProperty(this[i])) {
+						continue;
+					}
+				a.push(this[i]);
+				u[this[i]] = 1;
+				}
+			return a;
+			}
 		});
 	</script>
 </body>
