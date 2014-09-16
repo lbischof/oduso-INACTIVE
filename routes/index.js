@@ -189,7 +189,7 @@ router.get('/test/:distro', function(req,res){
 			}
 		});
 
-		res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: hasppa, hasdistro: true}, function(err, html){
+		res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), hastmp: true, hasarch: true, hasppa: hasppa, distro: distro}, function(err, html){
 			res.set('Content-Type', 'text/plain');
 			var script = html.replace(/&>.\/dev\/null/g, "> /dev/null 2>> ~/oduso-everything.txt").replace("2>>", "2>");
 			res.send(script);
