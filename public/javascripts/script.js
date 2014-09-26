@@ -133,5 +133,5 @@ $('body').tooltip({
     selector: '[data-toggle="tooltip"]',
     delay: {show: 500, hide: 0}
 });
-new Share('.share', {ui:{flyout:'bottom left'}});
+new Share('.share', {ui:{flyout:'bottom left'}, networks: {twitter:{description: 'Oduso: Install apps, themes and tweaks. Select the apps and paste the generated command into the terminal. Easy, Fast'}}});
 });
