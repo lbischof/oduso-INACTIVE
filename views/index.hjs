@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>{{ title }}</title>
+    <meta name="description" content="oduso is a tool to quickly install apps, themes and tweaks. Just select the apps that you would like to install and paste the generated command into the terminal.">
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/magicsuggest-min.css" />
@@ -12,8 +13,8 @@
   <body>
     
 <section>
-<h1 class="logo">~$ {{ title }}_</h1>
-<p>{{ title }} is a tool to quickly install apps, themes and tweaks. Just select the apps that you would like to install and paste the generated command into the terminal.</p>
+<h1 class="logo">~$ oduso_</h1>
+<p>oduso is a tool to quickly install apps, themes and tweaks. Just select the apps that you would like to install and paste the generated command into the terminal.</p>
 
 <div class="distro">
 <h2>Distro</h2>
