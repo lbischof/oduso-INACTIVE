@@ -6,7 +6,8 @@ var connection_string = '127.0.0.1:27017/oduso';
 var md5 = require('MD5');
 var cookieParser = require('cookie-parser');
 var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
-
+var ua = require('universal-analytics');
+var visitor = ua('UA-55027523-1');
 
 // if OPENSHIFT env variables are present, use the available connection info:
 if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
@@ -43,6 +44,12 @@ router.post('/form', function(req, res){
 	}); 
 });
 router.get('/oduso-:id.sh/:option?',function(req, res){
+    console.log(req.headers['user-agent']);
+	if (req.headers['user-agent'].indexOf('Wget') > -1) {
+		visitor.event("Script access", "wget", "UID: "+req.params.id).send();
+	} else {
+		visitor.event("Script access", "browser", "UID: "+req.params.id).send();
+	}
 	db.scripts.findOne({uid: req.params.id}, function (error, result) {
 		var script = result.script;
 		res.set('Content-Type', 'text/plain');
@@ -56,6 +63,7 @@ router.get('/oduso-:id.sh/:option?',function(req, res){
 });
 
 router.post('/generate', function(req, res){
+
 	var ids = [];
 	if (req.body.apps)
 		ids = req.body.apps;
@@ -93,16 +101,19 @@ router.post('/generate', function(req, res){
 					hasppa = true;
 				}
 			});
-			
 			docs.sort(compare);
 			
 			res.render('script', {docs: docs, ppas: ArrNoDupe(ppas), whenDone: whenDoneCommand, hastmp: hastmp, hasarch: hasarch, hasppa: hasppa, distro: distro}, function(err, html){
 				db.scripts.findOne({md5:md5(html)},function(err, docs){
+					var uid = generateUID();
 					if (docs){
 						res.send(generateWgetCommand(docs.uid, host));
+						visitor.event("Generate", "old script served", "UID: "+uid+ " Count: "+ids.length, ids.length).send();
 					} else {
-						db.scripts.insert({"script":html, "uid":generateUID(), "md5":md5(html)}, function(err, docs){
+						db.scripts.insert({"script":html, "uid":uid, "md5":md5(html)}, function(err, docs){
 							res.send(generateWgetCommand(docs.uid, host));
+							console.log(ids.length);
+							visitor.event("Generate", "new script generated", "UID: "+uid+ " Count: "+ids.length, ids.length).send();
 						});
 					}
 				});
