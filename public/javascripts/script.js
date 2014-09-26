@@ -133,5 +133,5 @@ $('body').tooltip({
     selector: '[data-toggle="tooltip"]',
     delay: {show: 500, hide: 0}
 });
-
+new Share('.share', {ui:{flyout:'bottom left'}});
 });

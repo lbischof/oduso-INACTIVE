@@ -212,3 +212,17 @@ color: white;
 background-color: #bfb1d5;
 color: white;
 }
+
+.share {
+z-index: 999;
+float: right;
+right: 0;
+}
+.share label {
+background: none !important;
+}
+@media (min-width: 1200px) {
+  .share {
+position: fixed;
+}
+}
