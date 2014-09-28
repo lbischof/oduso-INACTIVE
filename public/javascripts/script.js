@@ -15,8 +15,9 @@ $(function() {
           success: function(data){
             var data = JSON.parse(data);
             $('#generatedCommand').text(data.command);
-            if (navigator.appVersion.indexOf("Android") > -1 || navigator.appVersion.indexOf("Linux") === -1) 
-                $('#generatedIcons').before("<p>It looks like you aren't using Linux. You can email the script to yourself or save to Dropbox.</p>");
+            $('.notlinux').remove();
+            if (navigator.userAgent.indexOf("Android") > -1 || navigator.userAgent.indexOf("Linux") === -1) 
+                $('#generatedIcons').before("<p class='notlinux'>It looks like you aren't using Linux. You can email the script to yourself or save to Dropbox.</p>");
             $('#generatedIcons .source').attr("href", data.link);
             $('#generatedIcons .email').attr("href", "mailto:?subject=Oduso Installer&body=Paste this command into your Terminal to run the Installer:%0D%0A"+data.command);
             $('#generatedIcons .save').attr("href", data.link+"/download");

@@ -54,20 +54,7 @@ router.get('/', function(req,res) {
 	res.redirect('/admin/list');
 });
 router.get('/list', function(req,res){
-	/*db.apps.find({},{image: 0},function(err, docs){
-		var types = docs.reduce(function(buckets,doc){
-			if(!buckets[doc.type]) buckets[doc.type] = [];
-			buckets[doc.type].push(doc);
-			return buckets;
-		},{});
-		for(var index in types) {
-			types[index].sort(function(a, b){
-				return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-			});
-		}*/
-
 		res.render('list');
-	//});
 });
 router.get('/everything', function(req,res){
 	db.apps.find({},{image: 0},function(err, docs){

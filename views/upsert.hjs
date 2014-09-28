@@ -83,6 +83,10 @@ display: block;
     <img src="/image/{{doc._id}}">
   {{/doc.image}}
 </div>
+<!--<div class="form-group">
+  <label>Draft</label>
+  <input type="checkbox" name="draft" class="form-control" value="{{doc.draft}}">
+</div>-->
 <div class="form-group">
 	<label>Type</label>
   <select name="type" class="form-control type" value="{{doc.type}}" required>
