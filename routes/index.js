@@ -24,7 +24,7 @@ var db = mongojs(connection_string, ['apps','users','scripts','distros']);
 /* GET home page. */
 
 router.get('/', function(req, res) {
-	res.render('index', {title: req.secure+'Oduso Installer for Ubuntu and elementary OS'});
+	res.render('index', {title: 'Oduso Installer for Ubuntu and elementary OS'});
 });
 router.post('/form', function(req, res){
 	if (req.body.distro){
@@ -223,10 +223,10 @@ function generateUID() {
 	return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
 }
 function generateWgetCommand(uid, host){
-	var link = host+"/oduso-"+uid+".sh";
+	var link = "https://"+host+"/oduso-"+uid+".sh";
 	var output = {};
 	output.command = "wget -O - "+link+" | bash";
-	output.link = "http://"+link;
+	output.link = link;
 	return JSON.stringify(output);
 }
 function ArrNoDupe(a) {
