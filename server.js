@@ -32,7 +32,12 @@ app.use(session({secret: 'keyboard cat'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+app.use(function(req, res, next) {
+  if(!req.secure && !app.get('env') === 'development') {
+    return res.redirect(['https://', req.get('Host'), req.url].join(''));
+  }
+  next();
+});
 
 app.use('/', routes);
 app.use('/admin', admin);
