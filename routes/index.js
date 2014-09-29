@@ -24,7 +24,7 @@ var db = mongojs(connection_string, ['apps','users','scripts','distros']);
 /* GET home page. */
 
 router.get('/', function(req, res) {
-	res.render('index', {title: 'Oduso Installer for Ubuntu and elementary OS'});
+	res.render('index', {title: req.secure+'Oduso Installer for Ubuntu and elementary OS'});
 });
 router.post('/form', function(req, res){
 	if (req.body.distro){

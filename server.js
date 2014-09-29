@@ -32,12 +32,13 @@ app.use(session({secret: 'keyboard cat'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
-/*app.use(function(req, res, next) {
-  if(!req.secure) {
-    return res.redirect(['https://', req.get('Host'), req.url].join(''));
-  }
-  next();
-});*/
+app.use(function(req, res, next) {
+   if (req.headers['x-forwarded-proto'] === 'http' && app.get('port') !== '127.0.0.1') { 
+   		res.redirect('https://' + req.headers.host + req.path);
+   } else {
+   		return next();
+   }
+});
 
 app.use('/', routes);
 app.use('/admin', admin);
