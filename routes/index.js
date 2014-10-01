@@ -223,10 +223,10 @@ function generateUID() {
 	return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
 }
 function generateWgetCommand(uid, host){
-	var link = "https://"+host+"/oduso-"+uid+".sh";
+	var link = host+"/oduso-"+uid+".sh";
 	var output = {};
 	output.command = "wget -O - "+link+" | bash";
-	output.link = link;
+	output.link = "http://"+link;
 	return JSON.stringify(output);
 }
 function ArrNoDupe(a) {
