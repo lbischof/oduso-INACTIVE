@@ -226,7 +226,7 @@ function generateWgetCommand(uid, host){
 	var link = host+"/oduso-"+uid+".sh";
 	var output = {};
 	output.command = "wget -O - "+link+" | bash";
-	output.link = "http://"+link;
+	output.link = "https://"+link;
 	return JSON.stringify(output);
 }
 function ArrNoDupe(a) {
