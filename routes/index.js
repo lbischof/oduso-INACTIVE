@@ -43,7 +43,7 @@ router.post('/form', function(req, res){
 		res.render('form', {types: types});
 	}); 
 });
-router.get('/oduso-:id.sh/:option?',function(req, res){
+router.get('/:id.sh/:option?',function(req, res){
     console.log(req.headers['user-agent']);
 	if (req.headers['user-agent'].indexOf('Wget') > -1) {
 		visitor.event("Script access", "wget", "UID: "+req.params.id).send();
@@ -80,6 +80,7 @@ router.post('/generate', function(req, res){
 	var whenDone = req.body.whenDone;
 	var whenDoneCommand = getCommand(whenDone);
 	var host = req.get('host');
+	var protocol = req.protocol;
 	if (ids.length > 0){
 		ids = ids.map(function(id) { return mongojs.ObjectId(id); });
 		db.apps.find({_id: {$in: ids}}, {_id: 0}, function(err, docs){
@@ -107,11 +108,11 @@ router.post('/generate', function(req, res){
 				db.scripts.findOne({md5:md5(html)},function(err, docs){
 					var uid = generateUID();
 					if (docs){
-						res.send(generateWgetCommand(docs.uid, host));
+						res.send(generateWgetCommand(docs.uid, protocol, host));
 						visitor.event("Generate", "old script served", "UID: "+uid+ " Count: "+ids.length, ids.length).send();
 					} else {
 						db.scripts.insert({"script":html, "uid":uid, "md5":md5(html)}, function(err, docs){
-							res.send(generateWgetCommand(docs.uid, host));
+							res.send(generateWgetCommand(docs.uid, protocol, host));
 							console.log(ids.length);
 							visitor.event("Generate", "new script generated", "UID: "+uid+ " Count: "+ids.length, ids.length).send();
 						});
@@ -222,11 +223,11 @@ function getApps(distro, callback){
 function generateUID() {
 	return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
 }
-function generateWgetCommand(uid, host){
-	var link = host+"/oduso-"+uid+".sh";
+function generateWgetCommand(uid, protocol, host){
+	var link = host+"/"+uid+".sh";
 	var output = {};
 	output.command = "wget -O - "+link+" | bash";
-	output.link = "https://"+link;
+	output.link = protocol+"://"+link;
 	return JSON.stringify(output);
 }
 function ArrNoDupe(a) {
