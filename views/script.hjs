@@ -73,4 +73,5 @@ echo "Installing {{{name}}}"
 
 {{/whenDone}}
 ODUSO
+notify-send "Oduso" "Finished installing"
 exit 0
