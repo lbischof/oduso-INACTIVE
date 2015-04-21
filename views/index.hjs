@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>{{ title }}</title>
-    <meta name="description" content="Quickly install apps, themes and tweaks with Oduso. Just select the apps that you would like to install and paste the generated command into the terminal.">
+    <meta name="description" content="Quickly install ubuntu and elementary apps, themes and tweaks with Oduso. Just select the apps that you would like to install and paste the generated command into the terminal.">
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/magicsuggest-min.css" />
