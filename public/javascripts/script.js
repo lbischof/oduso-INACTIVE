@@ -89,13 +89,12 @@ var ms = $('#ms').magicSuggest({
 var distro = getCookie("distro");
 if (distro === undefined) {
     distro = "freya";
-    $('.distroselect').garlic( 'destroy' );
-    $('.distroselect').val("freya");
+    $('.distroselect').prop('selectedIndex', 0);
+    $('.distroselect').selectpicker('val','freya');
 }
 $(ms).on('selectionchange', function(e,m){
     $('#mainForm').find (':submit').removeAttr ('disabled');
     localStorage.setItem('ms'+distro,JSON.stringify(this.getSelection()));
-    console.log(JSON.stringify(this.getSelection()));
     $('#generated').fadeTo(400, 0, function(){
         $(this).css({visibility: "hidden"});
     });
